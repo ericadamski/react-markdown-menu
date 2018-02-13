@@ -47,7 +47,7 @@ describe('Menu', () => {
         expect(
           (wrapper = shallow(<Menu selection={'hello'} onChange={noop} />))
             .find(Container)
-            .prop('hidden')
+            .prop('visible')
         ).toBeTruthy();
       });
 

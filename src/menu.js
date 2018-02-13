@@ -14,7 +14,7 @@ const buttons = [
     onClick: header(2),
   },
   {
-    icon: '🇮🇹',
+    icon: '𝒾',
     onClick: italic,
   },
   {
@@ -51,7 +51,10 @@ export default class Menu extends Component {
     const { selection, x, y } = this.props;
 
     return (
-      <Container hidden={!!selection} position={{ x, y }}>
+      <Container
+        visible={selection && selection.length > 0}
+        position={{ x, y }}
+      >
         {buttons.map(button => (
           <Action
             key={button.icon}
