@@ -5215,8 +5215,8 @@ react-error-overlay@^4.0.0:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-4.0.0.tgz#d198408a85b4070937a98667f500c832f86bd5d4"
 
 react-markdown-menu@^1.0.0:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-markdown-menu/-/react-markdown-menu-1.0.3.tgz#a858c4c1d36ea8a7ee3f8f0ab3efb5ed14f9d9a7"
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/react-markdown-menu/-/react-markdown-menu-1.0.4.tgz#5b8bb6857e1ba7bf61202f82dda6fde4c2631822"
   dependencies:
     prop-types "^15.6.0"
     ramda "^0.25.0"
