@@ -1,6 +1,6 @@
 {
   "name": "react-markdown-menu",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description":
     "A small medium-esk react component to allow editing markdown files",
   "main": "dist/index.js",
@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "prop-types": "^15.6.0",
-    "ramda": "^0.25.0"
+    "ramda": "^0.25.0",
+    "styled-components": "^3.1.6"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^3.3.13",
@@ -47,8 +48,7 @@
     "react-dom": "^16.2.0",
     "react-test-renderer": "^16.2.0",
     "regenerator-runtime": "^0.11.1",
-    "sinon": "^4.3.0",
-    "styled-components": "^3.1.6"
+    "sinon": "^4.3.0"
   },
   "jest": {
     "rootDir": "./",
