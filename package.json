@@ -9,7 +9,7 @@
   "license": "MIT",
   "keywords": ["react", "component", "react-component", "components", "ui"],
   "bugs": {
-    "url": "https://github.com/pburtchaell/react-notification/issues"
+    "url": "https://github.com/ericadamski/react-markdown-menu/issues"
   },
   "peerDependencies": {
     "react": "^15.0.0 || ^16.0.0"
