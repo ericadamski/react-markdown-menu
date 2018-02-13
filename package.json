@@ -1,6 +1,6 @@
 {
   "name": "react-markdown-menu",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description":
     "A small medium-esk react component to allow editing markdown files",
   "main": "dist/index.js",

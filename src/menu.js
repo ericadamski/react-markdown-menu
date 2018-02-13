@@ -40,11 +40,15 @@ export default class Menu extends Component {
   };
 
   onChange(callback) {
-    const { onChange, selection } = this.props;
+    return event => {
+      const { onChange, selection } = this.props;
 
-    const modified = callback(selection);
+      event.stopPropagation();
 
-    onChange(modified);
+      const modified = callback(selection);
+
+      onChange(modified);
+    };
   }
 
   render() {
@@ -56,10 +60,7 @@ export default class Menu extends Component {
         position={{ x, y }}
       >
         {buttons.map(button => (
-          <Action
-            key={button.icon}
-            onClick={() => this.onChange(button.onClick)}
-          >
+          <Action key={button.icon} onClick={this.onChange(button.onClick)}>
             {button.icon}
           </Action>
         ))}

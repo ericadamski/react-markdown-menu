@@ -81,7 +81,7 @@ describe('Menu', () => {
       wrapper
         .find(Action)
         .first()
-        .simulate('click');
+        .simulate('click', { stopPropagation: noop });
 
       // Assert
       expect(onChange).toBeCalled();
