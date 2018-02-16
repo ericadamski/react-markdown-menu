@@ -1,42 +1,184 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { findDOMNode } from "react-dom";
+import { MediumMenu } from "react-markdown-menu";
 
-import { Section, Editor } from "./hero.styled";
+import { Observable } from "rxjs/Observable";
+import "rxjs/add/observable/fromEvent";
+import "rxjs/add/operator/withLatestFrom";
+import "rxjs/add/operator/takeUntil";
+import "rxjs/add/operator/filter";
+
+import { unwrapArray, noop, isDOMElement, getElementProps } from "./utils";
+
+import { Wrapper } from "./hero.styled";
 
 export default class Hero extends Component {
-  state = { selection: null };
+  static propTypes = {
+    onChange: PropTypes.func,
+    getLineRange: PropTypes.func,
+    getSelectionRange: PropTypes.func,
+    updateText: PropTypes.func,
+    updateSelection: PropTypes.func
+  };
+
+  static defaultProps = {
+    onChange: () => {},
+    getLineRange: () => {},
+    getSelectionRange: () => {},
+    updateText: () => {},
+    updateSelection: () => {}
+  };
+
+  state = { selection: null, start: -1, end: -1, top: -1, left: -1 };
 
   componentDidMount() {
-    if (this.area) {
-      this.area.addEventListener("select", () => {
-        const { value, selectionStart, selectionEnd } = this.area;
+    if (this._rootNode) {
+      const menu = findDOMNode(this.menuRef);
 
-        this.setState({
-          start: selectionStart,
-          end: selectionEnd,
-          selection: value.substring(selectionStart, selectionEnd)
+      this.click$ = Observable.fromEvent(document, "mousedown").filter(
+        ({ target }) => !menu.contains(target)
+      );
+
+      this.click$.subscribe(() => this.setState({ selection: null }));
+
+      this.selection$ = Observable.fromEvent(this._rootNode, "select")
+        .withLatestFrom(this.click$)
+        .subscribe(([select, click]) => {
+          const { value, selectionStart, selectionEnd } = this._rootNode;
+
+          this.setState({
+            top: click.screenY,
+            left: click.screenX,
+            selection: value.substring(selectionStart, selectionEnd)
+          });
         });
-      });
     }
   }
 
-  onChange(text) {
-    const { selection, start, end } = this.state;
-
-    this.area.value = `${this.area.value.slice(
-      0,
-      start
-    )}${text}${this.area.value.slice(end)}`;
-
-    const diff = text.length - selection.length;
-
-    this.area.setSelectionRange(start, end + diff);
+  componentWillUnmount() {
+    this.click$ && this.click$.remove(this.selection$).unsubscribe();
   }
 
+  onChange(text, line = false) {
+    // this.textarea.value = `${this.textarea.value.slice(
+    //   0,
+    //   start
+    // )}${text}${this.textarea.value.slice(end)}`;
+
+    // const diff = text.length - selection.length;
+
+    // this.textarea.setSelectionRange(start, end + diff);
+
+    const selectionRange = line
+      ? this.props.getLineRange()
+      : this.props.getSelectionRange();
+
+    this.props.onChange(text);
+    this.props.updateText(this._rootNode, text, selectionRange);
+    this.props.updateSelection(this._rootNode, text, selectionRange);
+  }
+
+  getStateAndHelpers() {
+    const { selection } = this.state;
+    const { getEditorProps } = this;
+
+    return {
+      getEditorProps,
+      selection
+    };
+  }
+
+  //////////////////////////// ROOT
+
+  editorRef = node => (this._rootNode = node);
+
+  getEditorProps = (
+    { refKey = "ref", ...rest } = {},
+    { suppressRefError = false } = {}
+  ) => {
+    // this is used in the render to know whether the user has called getEditorProps.
+    // It uses that to know whether to apply the props automatically
+    this.getEditorProps.called = true;
+    this.getEditorProps.refKey = refKey;
+    this.getEditorProps.suppressRefError = suppressRefError;
+    return { [refKey]: this.editorRef, ...rest };
+  };
+
+  //\\\\\\\\\\\\\\\\\\\\\\\\\\ ROOT
+
   render() {
-    return (
-      <Section>
-        <Editor />
-      </Section>
+    const { selection, top, left } = this.state;
+
+    const rerender = el => (
+      <Wrapper>
+        <MediumMenu
+          ref={node => (this.menuRef = node)}
+          x={left}
+          y={top}
+          selection={selection}
+          onChange={console.log}
+        />
+        {el}
+      </Wrapper>
+    );
+
+    const children = unwrapArray(
+      this.props.render || this.props.children,
+      noop
+    );
+    // we reset this so we know whether the user calls getEditorProps during
+    // this render. If they do then we don't need to do anything,
+    // if they don't then we need to clone the element they return and
+    // apply the props for them.
+    this.getEditorProps.called = false;
+    this.getEditorProps.refKey = undefined;
+    this.getEditorProps.suppressRefError = undefined;
+
+    const element = unwrapArray(children(this.getStateAndHelpers()));
+
+    if (!element) {
+      return null;
+    }
+    if (this.getEditorProps.called) {
+      if (!this.getEditorProps.suppressRefError) {
+        validateGetEditorectly(element, this.getEditorProps);
+      }
+      return rerender(element);
+    } else if (isDOMElement(element)) {
+      // they didn't apply the root props, but we can clone
+      // this and apply the props ourselves
+      return rerender(
+        React.cloneElement(
+          element,
+          this.getEditorProps(getElementProps(element))
+        )
+      );
+    } else {
+      // they didn't apply the root props, but they need to
+      // otherwise we can't query around the autocomplete
+      throw new Error(
+        "Markdown-Menu: If you return a non-DOM element, you must use apply the getEditorProps function"
+      );
+    }
+  }
+}
+
+function validateGetEditorectly(element, { refKey }) {
+  const refKeySpecified = refKey !== "ref";
+  const isComposite = !isDOMElement(element);
+  if (isComposite && !refKeySpecified) {
+    throw new Error(
+      "downshift: You returned a non-DOM element. You must specify a refKey in getEditorProps"
+    );
+  } else if (!isComposite && refKeySpecified) {
+    throw new Error(
+      `downshift: You returned a DOM element. You should not specify a refKey in getEditorProps. You specified "${refKey}"`
+    );
+  }
+  if (!getElementProps(element)[refKey]) {
+    throw new Error(
+      `downshift: You must apply the ref prop "${refKey}" from getEditorProps onto your root element.`
     );
   }
 }

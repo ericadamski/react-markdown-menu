@@ -7,8 +7,4 @@ export const Section = styled.section`
   padding: 4em 0;
 `;
 
-export const Editor = styled.textarea`
-  resize: none;
-  height: 33vh;
-  width: 66vw;
-`;
+export const Wrapper = styled.div``;

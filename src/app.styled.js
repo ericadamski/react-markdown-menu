@@ -1,4 +1,4 @@
-import styled, { css, injectGlobal } from "styled-components";
+import styled, { injectGlobal } from "styled-components";
 import { colors } from "./colors";
 
 injectGlobal`
@@ -32,4 +32,10 @@ export const Title = styled.h1`
   font-size: 3rem;
   width: 100%;
   text-align: center;
+`;
+
+export const Editor = styled.textarea`
+  resize: none;
+  height: 33vh;
+  width: 66vw;
 `;

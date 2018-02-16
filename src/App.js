@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 
-import { MediumMenu } from "react-markdown-menu";
-
-import Hero from "./hero";
-import { Page, Header, Title } from "./app.styled";
+import Menu from "./hero";
+import { Page, Header, Title, Editor } from "./app.styled";
 
 class App extends Component {
   render() {
@@ -12,7 +10,11 @@ class App extends Component {
         <Header>
           <Title>React-Markdown-Menu</Title>
         </Header>
-        <Hero />
+        <Menu>
+          {({ getEditorProps }) => (
+            <Editor {...getEditorProps({ refKey: "innerRef" })} />
+          )}
+        </Menu>
       </Page>
     );
   }
