@@ -1,187 +1,147 @@
-import { bold, header, link, quote, italic } from '../editor';
+import React from 'react';
+import styled from 'styled-components';
+import { mount } from 'enzyme';
+
+import { Wrapper } from '../editor.styled';
+import Editor from '../editor';
+import Menu from '../menu';
+
+const oldError = console.error;
+const MyComponent = styled.div``;
+
+beforeEach(() => {
+  console.error = jest.fn();
+});
+
+afterEach(() => {
+  console.error = oldError;
+});
 
 describe('editor', () => {
-  describe('.bold', () => {
-    it('should be a function with arity 1', () => {
+  describe('rendering', () => {
+    let wrapper;
+
+    afterEach(() => wrapper && wrapper.unmount());
+
+    it("shouldn't render if there is no children or render prop", () => {
       // Assert
-      expect(typeof bold).toBe('function');
-      expect(bold.length).toEqual(1);
+      expect((wrapper = mount(<Editor />)).html()).toBeNull();
     });
 
-    it('it should return a markdown bolded string', () => {
+    describe('should automatically call getEditorProps if a DOM node is passed as', () => {
+      it('children', () => {
+        // Arrange
+        const renderFn = () => <div />;
+
+        // Act
+        wrapper = mount(<Editor>{renderFn}</Editor>);
+        const instance = wrapper.instance();
+
+        // Assert
+        expect(instance.getEditorProps).toBeTruthy();
+      });
+
+      it('render prop', () => {
+        // Arrange
+        const renderFn = () => <div />;
+
+        // Act
+        wrapper = mount(<Editor render={renderFn} />);
+        const instance = wrapper.instance();
+
+        // Assert
+        expect(instance.getEditorProps).toBeTruthy();
+      });
+    });
+
+    it('should render when passing a composite component and calling getEditorProps specifing the ref', () => {
       // Arrange
-      const str = 'sandwich';
-      const expectedStr = `__${str}__`;
-
-      // Act
-      const result = bold(str);
+      const renderFn = ({ getEditorProps }) => (
+        <MyComponent {...getEditorProps({ refKey: 'innerRef' })} />
+      );
 
       // Assert
-      expect(result).toEqual(expectedStr);
+      expect(() => mount(<Editor render={renderFn} />)).not.toThrow();
     });
 
-    it('should unbold if the text is already bold', () => {
+    it('passing a non-DOM element and not calling getEditorProps should through an error', () => {
       // Arrange
-      const expectedStr = 'sandwich';
-      const str = `__${expectedStr}__`;
-
-      // Act
-      const result = bold(str);
+      const renderFn = () => <MyComponent />;
 
       // Assert
-      expect(result).toEqual(expectedStr);
-    });
-  });
-
-  describe('.header', () => {
-    it('should be a function with arity 1', () => {
-      // Assert
-      expect(typeof header).toBe('function');
-      expect(header.length).toEqual(2);
+      expect(() =>
+        mount(<Editor render={renderFn} />)
+      ).toThrowErrorMatchingSnapshot();
     });
 
-    it('it should return a markdown header string', () => {
+    it('returning a DOM element and calling getEditorProps with a refKey results in an error', () => {
       // Arrange
-      const str = 'this should be a line sandwich';
-      const expectedStr = `# ${str}`;
-
-      // Act
-      const result = header(1, str);
+      const renderFn = ({ getEditorProps }) => <div {...getEditorProps()} />;
 
       // Assert
-      expect(result).toEqual(expectedStr);
+      expect(() =>
+        mount(<Editor render={renderFn} />)
+      ).toThrowErrorMatchingSnapshot();
     });
 
-    it('it should return a markdown header (2) string', () => {
+    it('returning a composite component and calling getEditorProps without a refKey results in an error', () => {
       // Arrange
-      const str = 'this should be a line sandwich';
-      const expectedStr = `## ${str}`;
-
-      // Act
-      const result = header(2, str);
+      const renderFn = ({ getEditorProps }) => (
+        <MyComponent {...getEditorProps()} />
+      );
 
       // Assert
-      expect(result).toEqual(expectedStr);
+      expect(() =>
+        mount(<Editor render={renderFn} />)
+      ).toThrowErrorMatchingSnapshot();
     });
 
-    it('should unheader if the line is already a header', () => {
-      // Arrange
-      const expectedStr = 'this should be a line sandwich';
-      const str = `## ${expectedStr}`;
+    describe('elements', () => {
+      it('should render a Wrapper component', () => {
+        // Assert
+        expect(
+          (wrapper = mount(<Editor render={() => <div />} />))
+            .find(Wrapper)
+            .exists()
+        ).toBeTruthy();
+      });
 
-      // Act
-      const result = header(1, str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
-    });
-  });
-
-  describe('.italic', () => {
-    it('should be a function with arity 1', () => {
-      // Assert
-      expect(typeof italic).toBe('function');
-      expect(italic.length).toEqual(1);
-    });
-
-    it('it should return a markdown italic string', () => {
-      // Arrange
-      const str = 'sandwich';
-      const expectedStr = `_${str}_`;
-
-      // Act
-      const result = italic(str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
+      it('should render a Menu component', () => {
+        // Assert
+        expect(
+          (wrapper = mount(<Editor render={() => <div />} />))
+            .find(Menu)
+            .exists()
+        ).toBeTruthy();
+      });
     });
 
-    it('should unitalic if the text is already italic', () => {
-      // Arrange
-      const expectedStr = 'sandwich';
-      const str = `_${expectedStr}_`;
+    describe('events', () => {
+      //   onChange: () => {},
+      // getLineRange: () => {},
+      // getSelectionRange: () => {},
+      // updateText: () => {},
+      // updateSelection: () => {},
+      // onChangeSelection: () => {},
+      describe('should emit from selection$ when onChangeSelection is called ', () => {
+        it('should be a function that gets passed the root element and the next handler', () => {
+          // Arrange
+          const didChangeSelection = jest.fn();
 
-      // Act
-      const result = italic(str);
+          // Act
+          wrapper = mount(
+            <Editor
+              onChangeSelection={didChangeSelection}
+              render={() => <div />}
+            />
+          );
 
-      // Assert
-      expect(result).toEqual(expectedStr);
-    });
-  });
+          // Assert
+          expect(didChangeSelection).toBeCalled();
+        });
 
-  describe('.link', () => {
-    it('should be a function with arity 1', () => {
-      // Assert
-      expect(typeof link).toBe('function');
-      expect(link.length).toEqual(1);
-    });
-
-    it('it should return a markdown link string', () => {
-      // Arrange
-      const str = 'sandwich';
-      const expectedStr = `[${str}]()`;
-
-      // Act
-      const result = link(str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
-    });
-
-    it('should unlink if the text is already link', () => {
-      // Arrange
-      const expectedStr = 'sandwich';
-      const str = `[${expectedStr}](http://google.ca)`;
-
-      // Act
-      const result = link(str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
-    });
-
-    it('should unlink if the text is already link, but empty', () => {
-      // Arrange
-      const expectedStr = 'sandwich';
-      const str = `[${expectedStr}]()`;
-
-      // Act
-      const result = link(str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
-    });
-  });
-
-  describe('.quote', () => {
-    it('should be a function with arity 1', () => {
-      // Assert
-      expect(typeof quote).toBe('function');
-      expect(quote.length).toEqual(1);
-    });
-
-    it('it should return a markdown quote string', () => {
-      // Arrange
-      const str = 'this should be a line sandwich';
-      const expectedStr = `> ${str}`;
-
-      // Act
-      const result = quote(str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
-    });
-
-    it('should unquote if the line is already a quote', () => {
-      // Arrange
-      const expectedStr = 'this should be a line sandwich';
-      const str = `> ${expectedStr}`;
-
-      // Act
-      const result = quote(str);
-
-      // Assert
-      expect(result).toEqual(expectedStr);
+        it('can return the new value', () => {});
+      });
     });
   });
 });

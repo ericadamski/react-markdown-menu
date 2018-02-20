@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`editor rendering passing a non-DOM element and not calling getEditorProps should through an error 1`] = `"Markdown-Menu: If you return a non-DOM element, you must use apply the getEditorProps function"`;
+
+exports[`editor rendering returning a DOM element and calling getEditorProps with a refKey results in an error 1`] = `"Markdown-Menu: You must apply the ref prop \\"ref\\" from getEditorProps onto your root element."`;
+
+exports[`editor rendering returning a composite component and calling getEditorProps without a refKey results in an error 1`] = `"Markdown-Menu: You returned a non-DOM element. You must specify a refKey in getEditorProps"`;

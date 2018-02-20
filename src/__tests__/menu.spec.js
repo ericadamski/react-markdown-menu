@@ -4,7 +4,7 @@ import { shallow } from 'enzyme';
 
 import Menu from '../menu';
 import { Container, Action } from '../menu.styled';
-import { header } from '../editor';
+import { header } from '../editor-utils';
 
 describe('Menu', () => {
   const noop = () => null;
@@ -85,7 +85,7 @@ describe('Menu', () => {
 
       // Assert
       expect(onChange).toBeCalled();
-      expect(onChange).toBeCalledWith(header(1, selection));
+      expect(onChange).toBeCalledWith(header(1, selection), true);
     });
   });
 });
