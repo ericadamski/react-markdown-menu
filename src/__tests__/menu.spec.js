@@ -76,7 +76,13 @@ describe('Menu', () => {
       const onChange = jest.fn();
 
       // Act
-      wrapper = shallow(<Menu selection={selection} onChange={onChange} />);
+      wrapper = shallow(
+        <Menu
+          selection={selection}
+          lineSelection={selection}
+          onChange={onChange}
+        />
+      );
 
       wrapper
         .find(Action)

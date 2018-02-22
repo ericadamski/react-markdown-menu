@@ -42,16 +42,17 @@ export default class Menu extends Component {
     x: PropTypes.number,
     y: PropTypes.number,
     onChange: PropTypes.func.isRequired,
+    lineSelection: PropTypes.string,
     selection: PropTypes.string,
   };
 
   onChange(callback, isLine) {
     return event => {
-      const { onChange, selection } = this.props;
+      const { onChange, selection, lineSelection } = this.props;
 
       event.stopPropagation();
 
-      const modified = callback(selection);
+      const modified = callback(isLine ? lineSelection : selection);
 
       onChange(modified, isLine);
     };
