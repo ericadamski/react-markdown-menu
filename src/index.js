@@ -1,2 +1,2 @@
-export * from './editor';
-export { default as MediumMenu } from './menu';
+export { default as Editor } from './editor';
+export { default as MarkdownMenu } from './menu';
