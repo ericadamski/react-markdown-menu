@@ -1,3 +1,11 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div``;
+import { Container } from './menu.styled';
+
+export const Wrapper = styled.div`
+  display: relative;
+
+  ${Container} {
+    position: absolute;
+  }
+`;

@@ -189,7 +189,7 @@ class App extends React.Component {
     return (
       <Editor
         onChange={console.log}
-        updateText={console.log}
+        updateText={this.updateText}
         updateSelection={this.updateSelection}
         getSelectionRange={this.getSelectionRange}
         onChangeSelection={(element, update) =>

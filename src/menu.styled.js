@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 const position = ({ x, y }) => css`
-  position: fixed;
+  position: absolute;
   top: ${y}px;
   left: ${x}px;
 `;
