@@ -61,8 +61,8 @@ export default class Editor extends Component {
           const { value, selectionStart, selectionEnd } = this._rootNode;
 
           this.setState({
-            top: click.screenY,
-            left: click.screenX,
+            top: click.clientY,
+            left: click.clientX,
             selection: value.substring(selectionStart, selectionEnd),
           });
         });

@@ -19,6 +19,7 @@ export const Container = styled.div`
   border: 1px solid #9196aa;
   border-radius: 0.5rem;
   box-shadow: 2px 5px 10px 0 rgba(100, 100, 100, 0.5);
+  color: black;
 
   display: flex;
   overflow: hidden;
