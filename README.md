@@ -13,7 +13,7 @@ or
 
 `yarn add react-markdown-menu`
 
-# Useage
+# Usage
 
 While the component is intended to be used as a compound component until it has been tested the main usage will be through the base `MarkdownMenu` component
 
